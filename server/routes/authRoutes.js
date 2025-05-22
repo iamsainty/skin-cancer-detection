@@ -9,7 +9,14 @@ const jwt = require("jsonwebtoken");
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, age, gender } = req.body;
-    const user = await User.create({ name, email, password, age, gender });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      age,
+      gender,
+    });
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 10 * 60000);
     await sendOTP(email, otp);
@@ -43,7 +50,7 @@ router.post("/login", async (req, res) => {
     if (!user) return res.status(400).json({ msg: "User not found" });
     if (!user.isVerified)
       return res.status(400).json({ msg: "User not verified" });
-    const isMatch = bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid password" });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(200).json({ msg: "Login successful", token });
