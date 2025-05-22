@@ -5,12 +5,17 @@ const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', age: '', gender: '' });
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' }); // new message state
+
   const navigate = useNavigate();
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setLoading(true);
+    setMessage({ type: '', text: '' });
 
     try {
       const res = await fetch('http://localhost:5001/api/auth/register', {
@@ -19,22 +24,27 @@ const Register = () => {
         body: JSON.stringify(form),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.msg || 'Registration failed');
+        setMessage({ type: 'error', text: data.msg || 'Registration failed' });
         return;
       }
 
-      alert('OTP sent to your email. Please verify.');
+      setMessage({ type: 'success', text: 'OTP sent to your email. Please verify.' });
       setShowOtp(true);
     } catch (error) {
       console.error('Error:', error);
-      alert('Something went wrong. Try again later.');
+      setMessage({ type: 'error', text: 'Something went wrong. Try again later.' });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleVerifyOtp = async e => {
     e.preventDefault();
+    setLoading(true);
+    setMessage({ type: '', text: '' });
 
     try {
       const res = await fetch('http://localhost:5001/api/auth/verifyotp', {
@@ -43,25 +53,26 @@ const Register = () => {
         body: JSON.stringify({ email: form.email, otp }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.msg || 'OTP verification failed');
+        setMessage({ type: 'error', text: data.msg || 'OTP verification failed' });
         return;
       }
 
-      const data = await res.json();
       const token = data.token;
       if (token) {
         localStorage.setItem("token", token);
         navigate('/detect');
+        window.location.reload();
+      } else {
+        setMessage({ type: 'error', text: 'Something went wrong. Try again later.' });
       }
-      else {
-        alert('Something went wrong. Try again later.');
-      }
-
     } catch (error) {
       console.error('Error:', error);
-      alert('Something went wrong. Try again later.');
+      setMessage({ type: 'error', text: 'Something went wrong. Try again later.' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,6 +85,16 @@ const Register = () => {
         <h2 className="text-2xl font-semibold text-center text-blue-700">
           {showOtp ? 'Verify Your Email' : 'Create Your Account'}
         </h2>
+
+        {message.text && (
+          <div
+            className={`text-sm px-4 py-2 rounded text-center ${
+              message.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
 
         {showOtp ? (
           <>
@@ -95,9 +116,12 @@ const Register = () => {
             />
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+              disabled={loading}
+              className={`w-full py-2 rounded-lg transition ${
+                loading ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'
+              } text-white`}
             >
-              Verify OTP
+              {loading ? 'Verifying...' : 'Verify OTP'}
             </button>
           </>
         ) : (
@@ -147,9 +171,12 @@ const Register = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+              disabled={loading}
+              className={`w-full py-2 rounded-lg transition ${
+                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              } text-white`}
             >
-              Register
+              {loading ? 'Registering...' : 'Register'}
             </button>
             <p className="text-sm text-center text-gray-600">
               Already have an account?{' '}

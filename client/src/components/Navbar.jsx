@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-
-  console.log(user);
-  
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
@@ -17,68 +15,75 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
+    window.location.reload();
+    setIsOpen(false);
   };
 
+  const NavLink = ({ to, children }) => (
+    <Link
+      to={to}
+      onClick={closeMenu}
+      className={`px-3 py-2 rounded-md transition text-sm font-medium ${
+        pathname === to ? 'text-blue-600 font-semibold' : 'text-gray-700 hover:text-blue-600'
+      }`}
+    >
+      {children}
+    </Link>
+  );
+
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-blue-700">
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-bold text-blue-700 tracking-wide">
           Derm<span className="text-blue-500">AI</span>
         </Link>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex space-x-6 items-center text-gray-700 font-medium">
-          <Link to="/" className="hover:text-blue-600 transition">Home</Link>
-          {user && (
-            <Link to="/detect" className="hover:text-blue-600 transition">Detect</Link>
-          )}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-6">
+          <NavLink to="/">Home</NavLink>
+          {user && <NavLink to="/detect">Detect</NavLink>}
           {user ? (
             <button
               onClick={handleLogout}
-              className="bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
             >
               Logout
             </button>
           ) : (
             <>
-              <Link to="/login" className="hover:text-blue-600 transition">Login</Link>
-              <Link to="/register" className="hover:text-blue-600 transition">Register</Link>
+              <NavLink to="/login">Login</NavLink>
+              <NavLink to="/register">Register</NavLink>
             </>
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button className="md:hidden" onClick={toggleMenu} aria-label="Toggle menu">
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 p-1 rounded"
+          onClick={toggleMenu}
+          aria-label="Toggle navigation menu"
+        >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </nav>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white px-6 pb-4 shadow-md">
-          <Link to="/" onClick={closeMenu} className="block py-2 text-gray-700 hover:text-blue-600">
-            Home
-          </Link>
-          {user && (
-            <Link to="/detect" onClick={closeMenu} className="block py-2 text-gray-700 hover:text-blue-600">
-              Detect
-            </Link>
-          )}
+        <div className="md:hidden absolute top-16 left-0 w-full bg-white shadow-md z-40 px-6 pb-4 pt-2 space-y-2 transition-all">
+          <NavLink to="/">Home</NavLink>
+          {user && <NavLink to="/detect">Detect</NavLink>}
           {user ? (
             <button
               onClick={handleLogout}
-              className="w-full text-left py-2 text-blue-600 hover:underline"
+              className="w-full text-left py-2 text-blue-600 hover:underline text-sm"
             >
               Logout
             </button>
           ) : (
             <>
-              <Link to="/login" onClick={closeMenu} className="block py-2 text-gray-700 hover:text-blue-600">
-                Login
-              </Link>
-              <Link to="/register" onClick={closeMenu} className="block py-2 text-gray-700 hover:text-blue-600">
-                Register
-              </Link>
+              <NavLink to="/login">Login</NavLink>
+              <NavLink to="/register">Register</NavLink>
             </>
           )}
         </div>
