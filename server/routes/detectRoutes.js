@@ -29,7 +29,7 @@ router.post(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "meta-llama/llama-4-maverick:free",
+            model: "meta-llama/llama-4-scout:free",
             messages: [
               {
                 role: "user",
@@ -54,7 +54,6 @@ router.post(
       const data = await aiResponse.json();
 
       const cancerChance = data?.choices?.[0]?.message?.content?.trim();
-
 
       if (!cancerChance || isNaN(cancerChance)) {
         return res
