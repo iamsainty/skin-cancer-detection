@@ -1,4 +1,7 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { v4: uuid } = require("uuid");
+const path = require("path");
+
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -20,9 +23,7 @@ const uploadToS3 = async (file) => {
 
   await s3.send(command);
 
-  return {
-    Location: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
-  };
+  return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 };
 
 module.exports = uploadToS3;
