@@ -5,12 +5,14 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  const serverUrl = "https://derm-ai-server.vercel.app/";
+
   useEffect(() => {
     fetchUser();
   }, []);
 
   const fetchUser = async () => {
-    const res = await fetch("http://localhost:5001/api/auth/me", {
+    const res = await fetch(`${serverUrl}/api/auth/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -7,7 +7,7 @@ const Register = () => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' }); // new message state
-
+  const serverUrl = "https://derm-ai-server.vercel.app";
   const navigate = useNavigate();
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,7 +18,7 @@ const Register = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch('http://localhost:5001/api/auth/register', {
+      const res = await fetch(`${serverUrl}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -47,7 +47,7 @@ const Register = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      const res = await fetch('http://localhost:5001/api/auth/verifyotp', {
+      const res = await fetch(`${serverUrl}/api/auth/verifyotp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, otp }),

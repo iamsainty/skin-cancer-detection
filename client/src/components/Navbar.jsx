@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); // Assuming your AuthContext has a logout method
+  const { user, logout } = useAuth();
 
   const toggleMenu = () => setIsOpen((prev) => !prev);
   const closeMenu = () => setIsOpen(false);
 
-  // Optional: prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -24,7 +23,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     if (logout) {
-      logout(); // Use context logout if exists
+      logout();
     } else {
       localStorage.removeItem("token");
     }

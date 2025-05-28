@@ -15,7 +15,7 @@ const Detect = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const resultRef = useRef(null);
-
+  const serverUrl = "https://derm-ai-server.vercel.app";
   useEffect(() => {
     if (!token) navigate('/');
   }, [navigate, token]);
@@ -58,7 +58,7 @@ const Detect = () => {
     formData.append("image", image);
 
     try {
-      const res = await fetch("http://localhost:5001/api/detect/detectcancer", {
+      const res = await fetch(`${serverUrl}/api/detect/detectcancer`, {
         method: "POST",
         headers: { token },
         body: formData,
