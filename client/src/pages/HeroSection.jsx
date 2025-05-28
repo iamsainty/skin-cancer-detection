@@ -8,7 +8,7 @@ import {
   FaBandAid,
   FaNotesMedical,
 } from "react-icons/fa";
-
+import { motion } from "framer-motion";
 const floatingVariants = {
   float: {
     y: [0, -10, 0],
