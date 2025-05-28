@@ -13,7 +13,7 @@ router.post(
   async (req, res) => {
     try {
       const result = await uploadToS3(req.file);
-      const imageUrl = result.Location;
+      const imageUrl = result;
 
       const user = await User.findById(req.userId);
       const { age, gender } = user;

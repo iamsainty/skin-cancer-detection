@@ -1,25 +1,28 @@
-const AWS = require("aws-sdk");
-const { v4: uuid } = require("uuid");
-const path = require("path");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_DERM,
-  secretAccessKey: process.env.AWS_SECRET_KEY_DERM,
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_DERM,
+    secretAccessKey: process.env.AWS_SECRET_KEY_DERM,
+  },
 });
 
-const uploadToS3 = (file) => {
-  const fileExt = path.extname(file.originalname);
-  const key = `uploads/${uuid()}${fileExt}`;
+const uploadToS3 = async (file) => {
+  const key = `uploads/${uuid()}${path.extname(file.originalname)}`;
 
-  const params = {
+  const command = new PutObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: key,
     Body: file.buffer,
     ContentType: file.mimetype,
-  };
+  });
 
-  return s3.upload(params).promise();
+  await s3.send(command);
+
+  return {
+    Location: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
+  };
 };
 
 module.exports = uploadToS3;
