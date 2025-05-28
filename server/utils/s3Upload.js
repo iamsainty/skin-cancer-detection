@@ -1,7 +1,9 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuid } = require("uuid");
 const path = require("path");
+const dotenv = require("dotenv");
 
+dotenv.config();
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -10,6 +12,7 @@ const s3 = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_KEY_DERM,
   },
 });
+
 
 const uploadToS3 = async (file) => {
   const key = `uploads/${uuid()}${path.extname(file.originalname)}`;
