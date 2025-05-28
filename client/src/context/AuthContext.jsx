@@ -5,7 +5,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const serverUrl = "https://derm-ai-server.vercel.app/";
+  const serverUrl = "https://derm-ai-server.vercel.app";
 
   useEffect(() => {
     fetchUser();
